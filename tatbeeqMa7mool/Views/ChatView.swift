@@ -9,64 +9,82 @@ import SwiftUI
 
 
 struct ChatView: View {
-    
-    @State var currentUserMessage = ""
-    
-    @State var messages: [Message] = [
-        Message(id: "1", text: "Hi!", sender: .user, date: .now - 60000),
-        Message(id: "2", text: "Hello, How can I help!", sender: .agent, date: .now - 50000)
-    ]
+    @State var viewModel: ChatViewModel
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 20) {
-                Text("AI Chat")
-                    .font(Font.largeTitle.bold())
-                ForEach(messages) { message in
-                    HStack(){
-                        if message.sender == .user {
-                            Spacer()
-                            Text(message.date, style: .time)
-                                .font(.caption)
-                        }
-                        
-                            VStack{
-                                Text(message.text)
+        VStack(spacing: 0) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(spacing: 20) {
+                            if viewModel.hasMoreMessages && !viewModel.isLoading {
+                                Button {
+                                    Task { await viewModel.loadMoreMessages() }
+                                } label: {
+                                    if viewModel.isLoadingMore {
+                                        ProgressView()
+                                    } else {
+                                        Text("Load earlier messages")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .disabled(viewModel.isLoadingMore)
                             }
-                            .foregroundStyle(Color.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(message.sender == .user ? Color.green : Color.blue)
-                            .cornerRadius(10)
-                        
-
-                        if message.sender == .agent {
-                            Text(message.date, style: .time)
-                                .font(.caption)
-                            Spacer()
+                            ForEach(viewModel.messages) { message in
+                                MessageBubble(
+                                    message: message,
+                                    onFeedback: { feedback in
+                                        Task { await viewModel.toggleFeedback(messageId: message.id, feedback: feedback) }
+                                    },
+                                    onRetry: {
+                                        Task { await viewModel.retryMessage(message.id) }
+                                    }
+                                )
                         }
+                        if let error = viewModel.errorMessage {
+                            Text(error)
+                                .foregroundStyle(.red)
+                                .font(.caption)
+                        }
+                        Color.clear
+                            .frame(height: 1)
+                            .id("bottom")
                     }
+                    .padding()
+                }
+                .frame(maxWidth: .infinity)
+                .onChange(of: viewModel.messages.last?.text) {
+                    proxy.scrollTo("bottom", anchor: .bottom)
                 }
             }
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        
-        HStack {
-            TextField("Enter your message", text: $currentUserMessage)
-                .padding(.horizontal)
-                .textFieldStyle(.roundedBorder)
-            
-            Button("Send"){
-                if currentUserMessage.isEmpty {return}
-                messages.append(Message(id: UUID().uuidString, text: currentUserMessage, sender: .user, date: .now))
-                currentUserMessage = ""
-            }
-        }
-        .padding()
-    }
-}
 
-#Preview {
-    ChatView()
+            HStack {
+                TextField("Enter your message", text: $viewModel.inputText)
+                    .textFieldStyle(.roundedBorder)
+                    .onSubmit {
+                        Task { await viewModel.sendMessage() }
+                    }
+
+                Button("Send") {
+                    Task {
+                        await viewModel.sendMessage()
+                    }
+                }
+                .disabled(viewModel.isLoading)
+            }
+            .padding()
+            }
+        .navigationTitle("AI Chat")
+        .background(viewModel.background)
+        .task { await viewModel.loadConversation() }
+        .toolbar {
+            Button {
+                viewModel.newConversation()
+            } label: {
+                Image(systemName: "square.and.pencil")
+            }
+            .disabled(viewModel.isLoading)
+        }
+    }
 }

@@ -6,19 +6,60 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		78C5B61F2F64CB020096441A /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 78C5B61E2F64CB020096441A /* Secrets.xcconfig */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7881F6732F7C59CB002DB920 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78C5B5F12F6260520096441A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78C5B5F82F6260520096441A;
+			remoteInfo = tatbeeqMa7mool;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		7881F66F2F7C59CB002DB920 /* tatbeeqMa7moolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = tatbeeqMa7moolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		78C5B5F92F6260520096441A /* tatbeeqMa7mool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tatbeeqMa7mool.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		78C5B61E2F64CB020096441A /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		786481A22F69052900886B39 /* Exceptions for "tatbeeqMa7mool" folder in "tatbeeqMa7mool" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 78C5B5F82F6260520096441A /* tatbeeqMa7mool */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		7881F6702F7C59CB002DB920 /* tatbeeqMa7moolTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = tatbeeqMa7moolTests;
+			sourceTree = "<group>";
+		};
 		78C5B5FB2F6260520096441A /* tatbeeqMa7mool */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				786481A22F69052900886B39 /* Exceptions for "tatbeeqMa7mool" folder in "tatbeeqMa7mool" target */,
+			);
 			path = tatbeeqMa7mool;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7881F66C2F7C59CB002DB920 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		78C5B5F62F6260520096441A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,7 +74,9 @@
 			isa = PBXGroup;
 			children = (
 				78C5B5FB2F6260520096441A /* tatbeeqMa7mool */,
+				7881F6702F7C59CB002DB920 /* tatbeeqMa7moolTests */,
 				78C5B5FA2F6260520096441A /* Products */,
+				78C5B61E2F64CB020096441A /* Secrets.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				78C5B5F92F6260520096441A /* tatbeeqMa7mool.app */,
+				7881F66F2F7C59CB002DB920 /* tatbeeqMa7moolTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +92,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7881F66E2F7C59CB002DB920 /* tatbeeqMa7moolTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7881F6772F7C59CB002DB920 /* Build configuration list for PBXNativeTarget "tatbeeqMa7moolTests" */;
+			buildPhases = (
+				7881F66B2F7C59CB002DB920 /* Sources */,
+				7881F66C2F7C59CB002DB920 /* Frameworks */,
+				7881F66D2F7C59CB002DB920 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7881F6742F7C59CB002DB920 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7881F6702F7C59CB002DB920 /* tatbeeqMa7moolTests */,
+			);
+			name = tatbeeqMa7moolTests;
+			packageProductDependencies = (
+			);
+			productName = tatbeeqMa7moolTests;
+			productReference = 7881F66F2F7C59CB002DB920 /* tatbeeqMa7moolTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		78C5B5F82F6260520096441A /* tatbeeqMa7mool */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 78C5B6042F6260530096441A /* Build configuration list for PBXNativeTarget "tatbeeqMa7mool" */;
@@ -77,9 +144,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2630;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
+					7881F66E2F7C59CB002DB920 = {
+						CreatedOnToolsVersion = 26.4;
+						TestTargetID = 78C5B5F82F6260520096441A;
+					};
 					78C5B5F82F6260520096441A = {
 						CreatedOnToolsVersion = 26.3;
 					};
@@ -100,21 +171,37 @@
 			projectRoot = "";
 			targets = (
 				78C5B5F82F6260520096441A /* tatbeeqMa7mool */,
+				7881F66E2F7C59CB002DB920 /* tatbeeqMa7moolTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		78C5B5F72F6260520096441A /* Resources */ = {
+		7881F66D2F7C59CB002DB920 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		78C5B5F72F6260520096441A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78C5B61F2F64CB020096441A /* Secrets.xcconfig in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7881F66B2F7C59CB002DB920 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		78C5B5F52F6260520096441A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,9 +211,62 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		7881F6742F7C59CB002DB920 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78C5B5F82F6260520096441A /* tatbeeqMa7mool */;
+			targetProxy = 7881F6732F7C59CB002DB920 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		7881F6752F7C59CB002DB920 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V66AD354C5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = chatbase.tatbeeqMa7moolTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tatbeeqMa7mool.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/tatbeeqMa7mool";
+			};
+			name = Debug;
+		};
+		7881F6762F7C59CB002DB920 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V66AD354C5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = chatbase.tatbeeqMa7moolTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/tatbeeqMa7mool.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/tatbeeqMa7mool";
+			};
+			name = Release;
+		};
 		78C5B6022F6260530096441A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 78C5B61E2F64CB020096441A /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -248,6 +388,7 @@
 		};
 		78C5B6052F6260530096441A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 78C5B61E2F64CB020096441A /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -256,6 +397,7 @@
 				DEVELOPMENT_TEAM = V66AD354C5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = tatbeeqMa7mool/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +430,7 @@
 				DEVELOPMENT_TEAM = V66AD354C5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = tatbeeqMa7mool/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -313,6 +456,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7881F6772F7C59CB002DB920 /* Build configuration list for PBXNativeTarget "tatbeeqMa7moolTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7881F6752F7C59CB002DB920 /* Debug */,
+				7881F6762F7C59CB002DB920 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		78C5B5F42F6260520096441A /* Build configuration list for PBXProject "tatbeeqMa7mool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

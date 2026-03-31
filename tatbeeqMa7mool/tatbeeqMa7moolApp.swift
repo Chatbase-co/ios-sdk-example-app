@@ -11,7 +11,12 @@ import SwiftUI
 struct tatbeeqMa7moolApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if let chatService = ChatService(client: URLSessionClient()) {
+                ConversationListView(viewModel: ConversationListViewModel(chatService: chatService))
+            } else {
+                Text("Missing API configuration")
+                    .foregroundStyle(.red)
+            }
         }
     }
 }
