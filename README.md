@@ -65,3 +65,7 @@ tatbeeqMa7moolTests/
   MockAPIClient.swift
   ChatServiceTests.swift
 ```
+
+## Preview
+<img width="301" height="655" alt="image" src="https://github.com/user-attachments/assets/383d910a-294c-4008-a41f-75528c14197f" />
+
