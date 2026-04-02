@@ -7,20 +7,21 @@
 
 import Foundation
 import os
+import ChatbaseSDK
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "tatbeeqMa7mool", category: "ConversationListViewModel")
 
 @MainActor @Observable
 class ConversationListViewModel {
-    let chatService: ChatService
+    let client: ChatbaseClient
     private(set) var conversations: [Conversation] = []
     private(set) var isLoading = false
     private(set) var errorMessage: String?
     private var nextCursor: String?
     private(set) var hasMore = true
 
-    init(chatService: ChatService) {
-        self.chatService = chatService
+    init(client: ChatbaseClient) {
+        self.client = client
     }
 
     func loadConversations() async {
@@ -28,7 +29,7 @@ class ConversationListViewModel {
         errorMessage = nil
 
         do {
-            let response = try await chatService.listConversations()
+            let response = try await client.listConversations()
             conversations = response.data
             nextCursor = response.pagination.cursor
             hasMore = response.pagination.hasMore
@@ -45,7 +46,7 @@ class ConversationListViewModel {
         isLoading = true
 
         do {
-            let response = try await chatService.listConversations(cursor: cursor)
+            let response = try await client.listConversations(cursor: cursor)
             conversations.append(contentsOf: response.data)
             nextCursor = response.pagination.cursor
             hasMore = response.pagination.hasMore

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ChatbaseSDK
 
 struct MessageBubble: View {
     let message: Message

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		78C5B61F2F64CB020096441A /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 78C5B61E2F64CB020096441A /* Secrets.xcconfig */; };
+		78F3D51E2F7DEE6D005F5890 /* ChatbaseSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 78F3D51D2F7DEE6D005F5890 /* ChatbaseSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,11 +38,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7881F6702F7C59CB002DB920 /* tatbeeqMa7moolTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = tatbeeqMa7moolTests;
-			sourceTree = "<group>";
-		};
 		78C5B5FB2F6260520096441A /* tatbeeqMa7mool */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -64,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78F3D51E2F7DEE6D005F5890 /* ChatbaseSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,7 +71,6 @@
 			isa = PBXGroup;
 			children = (
 				78C5B5FB2F6260520096441A /* tatbeeqMa7mool */,
-				7881F6702F7C59CB002DB920 /* tatbeeqMa7moolTests */,
 				78C5B5FA2F6260520096441A /* Products */,
 				78C5B61E2F64CB020096441A /* Secrets.xcconfig */,
 			);
@@ -105,9 +101,6 @@
 			dependencies = (
 				7881F6742F7C59CB002DB920 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				7881F6702F7C59CB002DB920 /* tatbeeqMa7moolTests */,
-			);
 			name = tatbeeqMa7moolTests;
 			packageProductDependencies = (
 			);
@@ -132,6 +125,7 @@
 			);
 			name = tatbeeqMa7mool;
 			packageProductDependencies = (
+				78F3D51D2F7DEE6D005F5890 /* ChatbaseSDK */,
 			);
 			productName = tatbeeqMa7mool;
 			productReference = 78C5B5F92F6260520096441A /* tatbeeqMa7mool.app */;
@@ -165,6 +159,9 @@
 			);
 			mainGroup = 78C5B5F02F6260520096441A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				78F3D51C2F7DEE6D005F5890 /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 78C5B5FA2F6260520096441A /* Products */;
 			projectDirPath = "";
@@ -484,6 +481,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		78F3D51C2F7DEE6D005F5890 /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Chatbase-co/chatbase-ios-sdk";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		78F3D51D2F7DEE6D005F5890 /* ChatbaseSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 78F3D51C2F7DEE6D005F5890 /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */;
+			productName = ChatbaseSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 78C5B5F12F6260520096441A /* Project object */;
 }

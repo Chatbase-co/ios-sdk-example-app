@@ -1,0 +1,15 @@
+{
+  "originHash" : "410d22783aa23dba47915e0fef2b6d52b28851b2ddc39cfbee0f2099de5b19d1",
+  "pins" : [
+    {
+      "identity" : "chatbase-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Chatbase-co/chatbase-ios-sdk",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f847e3a04785624dfbd5c37e3ffc45c1e75f6cf6"
+      }
+    }
+  ],
+  "version" : 3
+}

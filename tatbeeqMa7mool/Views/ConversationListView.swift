@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ChatbaseSDK
 
 struct ConversationListView: View {
     @State var viewModel: ConversationListViewModel
@@ -39,14 +40,14 @@ struct ConversationListView: View {
             .navigationDestination(for: Conversation.self) { conversation in
                 ChatView(
                     viewModel: ChatViewModel(
-                        chatService: viewModel.chatService,
+                        client: viewModel.client,
                         conversationId: conversation.id
                     )
                 )
             }
             .toolbar {
                 NavigationLink {
-                    ChatView(viewModel: ChatViewModel(chatService: viewModel.chatService))
+                    ChatView(viewModel: ChatViewModel(client: viewModel.client))
                 } label: {
                     Image(systemName: "square.and.pencil")
                 }
