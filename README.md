@@ -1,14 +1,16 @@
 # Chatbase iOS Example App
 
-A sample iOS app that demonstrates how to build a chat interface using the [ChatbaseSDK](https://github.com/Chatbase-co/chatbase-ios-sdk). Built with SwiftUI.
+A sample iOS app showing how to build a chat interface on the [ChatbaseSDK](https://github.com/Chatbase-co/chatbase-ios-sdk). Built with SwiftUI.
 
 ## What it does
 
-- Sends messages to a Chatbase agent and streams responses in real time
-- Lists and loads previous conversations with paginated message history
-- Handles client-side tool calls (the agent can trigger actions on the device, like opening a color picker)
+- Streams agent responses in real time into SwiftUI bindings via `ConversationState`
+- Lists previous conversations with paginated message history
+- Registers client-side tools the agent can invoke mid-turn:
+  - `package_status` — a synchronous tool that returns an object payload (or `{"error": ...}` for missing input)
+  - `change_background` — an async tool that opens a color picker, suspends until the user picks, and surfaces cancel as an error payload
+- Identifies the end user via a JWT (agent identity verification)
 - Supports message feedback (thumbs up/down) and message retry
-- Demonstrates multiple tool call patterns: resolve, fail, ignore, deferred UI
 
 ## Setup
 
@@ -17,12 +19,11 @@ A sample iOS app that demonstrates how to build a chat interface using the [Chat
 2. Create a file called `Secrets.xcconfig` in the project root (next to `.xcodeproj`):
 
 ```
-API_KEY = your-chatbase-api-key
 AGENT_ID = your-chatbase-agent-id
-API_BASE_URL = https://www.chatbase.co/api/v2
+API_BASE_URL = https://www.chatbase.co/api/sdk
 ```
 
-For local development against a local Chatbase instance, set `API_BASE_URL = http://localhost:3000/api/v2`.
+For local development against a local Chatbase instance, set `API_BASE_URL = http://localhost:3000/api/sdk`.
 
 3. In Xcode, wire the xcconfig to your build configuration:
    - Click the blue project icon in the navigator
@@ -40,18 +41,20 @@ For local development against a local Chatbase instance, set `API_BASE_URL = htt
 ```
 tatbeeqMa7mool/
   ViewModels/
+    AuthViewModel.swift
     ChatViewModel.swift
     ConversationListViewModel.swift
   Views/
+    AuthSheet.swift
     ChatView.swift
     ConversationListView.swift
-    MessageBubble.swift
+    MessageBubbleView.swift
     TypingIndicator.swift
   tatbeeqMa7moolApp.swift
   Info.plist
 ```
 
-The app depends on [ChatbaseSDK](https://github.com/Chatbase-co/chatbase-ios-sdk) for all API communication, models, and streaming.
+The app depends on [ChatbaseSDK](https://github.com/Chatbase-co/chatbase-ios-sdk) for all API communication, models, streaming, and the observable `ConversationState`.
 
 ## Preview
 <img width="301" height="655" alt="image" src="https://github.com/user-attachments/assets/383d910a-294c-4008-a41f-75528c14197f" />

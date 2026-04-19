@@ -55,7 +55,7 @@ struct AuthSheet: View {
                 .textContentType(.username)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
-            SecureField("Secret", text: $viewModel.secretInput)
+            SecureField("Chatbot Secret", text: $viewModel.secretInput)
         } header: {
             Text("Identity Verification")
         } footer: {

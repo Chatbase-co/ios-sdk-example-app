@@ -159,7 +159,7 @@
 			mainGroup = 78C5B5F02F6260520096441A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				78BF1C1F2F9461E000E1A17F /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */,
+				78730FEE2F952E7200DC53BA /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 78C5B5FA2F6260520096441A /* Products */;
@@ -483,7 +483,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		78BF1C1F2F9461E000E1A17F /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */ = {
+		78730FEE2F952E7200DC53BA /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Chatbase-co/chatbase-ios-sdk";
 			requirement = {

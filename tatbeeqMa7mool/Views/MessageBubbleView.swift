@@ -9,43 +9,66 @@ import SwiftUI
 import ChatbaseSDK
 
 struct MessageBubble: View {
-    let message: Message
+    let message: ConversationState.UiMessage
     var onRetry: (() -> Void)?
 
     var body: some View {
-        VStack(alignment: message.sender == .user ? .trailing : .leading, spacing: 4) {
+        switch message.kind {
+        case .text(let text):
+            TextBubble(
+                text: text,
+                sender: message.sender,
+                date: message.date,
+                isStreaming: message.isStreaming,
+                isError: message.isError,
+                canRetry: message.sender == .agent && message.messageId != nil && !text.isEmpty,
+                onRetry: onRetry
+            )
+        case .toolCall(let card):
+            ToolCallBubble(name: card.toolName, status: card.status)
+        }
+    }
+}
+
+private struct TextBubble: View {
+    let text: String
+    let sender: MessageSender
+    let date: Date
+    let isStreaming: Bool
+    let isError: Bool
+    let canRetry: Bool
+    let onRetry: (() -> Void)?
+
+    var body: some View {
+        VStack(alignment: sender == .user ? .trailing : .leading, spacing: 4) {
             HStack {
-                if message.sender == .user {
+                if sender == .user {
                     Spacer()
-                    Text(message.date, style: .time)
-                        .font(.caption)
+                    Text(date, style: .time).font(.caption)
                 }
 
                 Group {
-                    if message.sender == .agent && message.text.isEmpty {
+                    if sender == .agent && text.isEmpty && isStreaming {
                         TypingIndicator()
                     } else {
-                        Text(LocalizedStringKey(message.text))
+                        Text(LocalizedStringKey(text))
                             .foregroundStyle(.white)
                             .tint(.white)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(message.sender == .user ? Color.green : Color.blue)
+                            .background(background)
                             .cornerRadius(10)
                     }
                 }
 
-                if message.sender == .agent {
-                    Text(message.date, style: .time)
-                        .font(.caption)
+                if sender == .agent {
+                    Text(date, style: .time).font(.caption)
                     Spacer()
                 }
             }
 
-            if message.sender == .agent && !message.text.isEmpty {
-                Button {
-                    onRetry?()
-                } label: {
+            if canRetry {
+                Button { onRetry?() } label: {
                     Image(systemName: "arrow.counterclockwise")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -55,12 +78,44 @@ struct MessageBubble: View {
             }
         }
     }
+
+    private var background: Color {
+        if isError { return .red }
+        return sender == .user ? .green : .blue
+    }
 }
 
-#Preview {
-    VStack {
-        MessageBubble(message: Message(id: "1", text: "Hi!", sender: .user, date: .now))
-        MessageBubble(message: Message(id: "2", text: "Hello! How can I help?", sender: .agent, date: .now))
+private struct ToolCallBubble: View {
+    let name: String
+    let status: ConversationState.ToolCallCard.Status
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: iconName)
+                .foregroundStyle(iconColor)
+            Text(name).font(.caption).monospaced()
+            if status == .executing { ProgressView().controlSize(.mini) }
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
     }
-    .padding()
+
+    private var iconName: String {
+        switch status {
+        case .executing: return "gearshape.2.fill"
+        case .success: return "checkmark.circle.fill"
+        case .failure: return "xmark.octagon.fill"
+        }
+    }
+
+    private var iconColor: Color {
+        switch status {
+        case .executing: return .orange
+        case .success: return .green
+        case .failure: return .red
+        }
+    }
 }

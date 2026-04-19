@@ -16,7 +16,7 @@ struct ConversationListView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if viewModel.conversations.isEmpty && !viewModel.isLoading {
+                if viewModel.state.conversations.isEmpty && !viewModel.state.isLoading {
                     ContentUnavailableView(
                         "No Conversations",
                         systemImage: "bubble.left.and.bubble.right",
@@ -24,16 +24,16 @@ struct ConversationListView: View {
                     )
                 } else {
                     List {
-                        ForEach(viewModel.conversations) { conversation in
+                        ForEach(viewModel.state.conversations) { conversation in
                             NavigationLink(value: conversation) {
                                 ConversationRow(conversation: conversation)
                             }
                         }
 
-                        if viewModel.hasMore {
+                        if viewModel.state.hasMore {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
-                                .task { await viewModel.loadMore() }
+                                .task { viewModel.loadMore() }
                         }
                     }
                 }
@@ -64,10 +64,10 @@ struct ConversationListView: View {
             .sheet(isPresented: $showingAuthSheet) {
                 AuthSheet(viewModel: authViewModel)
             }
-            .task(id: authViewModel.isIdentified) { await viewModel.loadConversations() }
-            .refreshable { await viewModel.loadConversations() }
+            .task(id: authViewModel.isIdentified) { viewModel.load() }
+            .refreshable { viewModel.load() }
             .overlay {
-                if viewModel.isLoading && viewModel.conversations.isEmpty {
+                if viewModel.state.isLoading && viewModel.state.conversations.isEmpty {
                     ProgressView()
                 }
             }

@@ -14,13 +14,24 @@ struct ChatView: View {
 
     private var canSend: Bool {
         !viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        && !viewModel.isLoading
-        && !viewModel.isLoadingConversation
+        && !viewModel.state.isSending
+        && !viewModel.state.isLoadingHistory
+    }
+
+    private var scrollKey: String {
+        let last = viewModel.state.messages.last
+        let len: Int
+        switch last?.kind {
+        case .text(let t): len = t.count
+        case .toolCall(let card): len = card.status == .executing ? 1 : 2
+        case nil: len = 0
+        }
+        return "\(viewModel.state.messages.count)-\(len)"
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            if viewModel.isLoadingConversation {
+            if viewModel.state.isLoadingHistory && viewModel.state.messages.isEmpty {
                 Spacer()
                 ProgressView("Loading conversation...")
                 Spacer()
@@ -28,11 +39,11 @@ struct ChatView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(spacing: 20) {
-                            if viewModel.hasMoreMessages {
+                            if viewModel.state.hasMoreHistory {
                                 Button {
-                                    Task { await viewModel.loadMoreMessages() }
+                                    viewModel.loadMoreHistory()
                                 } label: {
-                                    if viewModel.isLoadingMore {
+                                    if viewModel.state.isLoadingHistory {
                                         ProgressView()
                                     } else {
                                         Text("Load earlier messages")
@@ -41,18 +52,18 @@ struct ChatView: View {
                                     }
                                 }
                                 .frame(maxWidth: .infinity)
-                                .disabled(viewModel.isLoadingMore)
+                                .disabled(viewModel.state.isLoadingHistory)
                             }
-                            ForEach(viewModel.messages) { message in
+                            ForEach(viewModel.state.messages) { message in
                                 MessageBubble(
                                     message: message,
-                                    onRetry: {
-                                        Task { await viewModel.retryMessage(message.id) }
+                                    onRetry: message.messageId.map { id in
+                                        { viewModel.retryMessage(id) }
                                     }
                                 )
                             }
-                            if let error = viewModel.errorMessage {
-                                Text(error)
+                            if let error = viewModel.state.error {
+                                Text(error.localizedDescription)
                                     .foregroundStyle(.red)
                                     .font(.caption)
                             }
@@ -63,7 +74,7 @@ struct ChatView: View {
                         .padding()
                     }
                     .frame(maxWidth: .infinity)
-                    .onChange(of: viewModel.messages.last?.text) {
+                    .onChange(of: scrollKey) {
                         proxy.scrollTo("bottom", anchor: .bottom)
                     }
                 }
@@ -78,20 +89,16 @@ struct ChatView: View {
                         .padding(.vertical, 8)
                         .background(Color(.systemGray6))
                         .cornerRadius(20)
-                        .onSubmit {
-                            if canSend {
-                                Task { await viewModel.sendMessage() }
-                            }
-                        }
+                        .onSubmit { if canSend { viewModel.sendMessage() } }
 
                     Button {
-                        Task { await viewModel.sendMessage() }
+                        viewModel.sendMessage()
                     } label: {
                         Image(systemName: "arrow.up.circle.fill")
                             .font(.title2)
                             .foregroundStyle(canSend ? .blue : .gray)
                     }
-                    .disabled(!canSend)
+                    .disabled(!canSend || viewModel.state.isSending)
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 8)
@@ -99,14 +106,16 @@ struct ChatView: View {
         }
         .navigationTitle("AI Chat")
         .background(viewModel.background)
-        .task { await viewModel.loadConversation() }
+        .onDisappear {
+            viewModel.cancelColorPick()
+        }
         .toolbar {
             Button {
                 viewModel.newConversation()
             } label: {
                 Image(systemName: "square.and.pencil")
             }
-            .disabled(viewModel.isLoading || viewModel.isLoadingConversation)
+            .disabled(viewModel.state.isSending || viewModel.state.isLoadingHistory)
         }
         .sheet(isPresented: $viewModel.showColorPicker) {
             viewModel.cancelColorPick()
@@ -130,14 +139,10 @@ struct ChatView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            viewModel.cancelColorPick()
-                        }
+                        Button("Cancel") { viewModel.cancelColorPick() }
                     }
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Apply") {
-                            viewModel.resolveColorPick(selectedColor)
-                        }
+                        Button("Apply") { viewModel.resolveColorPick(selectedColor) }
                     }
                 }
             }

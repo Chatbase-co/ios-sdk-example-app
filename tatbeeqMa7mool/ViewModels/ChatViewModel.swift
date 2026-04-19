@@ -14,102 +14,70 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "tatbeeqM
 
 @MainActor @Observable
 class ChatViewModel {
-    private let client: ChatbaseClient
-    private(set) var conversationId: String?
-    private(set) var messages: [Message] = []
+    let state: ConversationState
     var inputText: String = ""
-    private(set) var isLoading: Bool = false
-    private(set) var isLoadingConversation: Bool = false
-    private(set) var isLoadingMore: Bool = false
-    private(set) var errorMessage: String?
-    private var messagesPage: PaginatedResponse<Message>?
-    var hasMoreMessages: Bool { messagesPage?.hasMore ?? false }
-    private var currentStream: ChatStream?
 
-    // UI state for color picker tool
+    // UI state for the color-picker tool example.
     var background = Color.white
     var showColorPicker = false
     private var colorPickContinuation: CheckedContinuation<Color?, Never>?
 
     init(client: ChatbaseClient, conversationId: String? = nil) {
-        self.client = client
-        self.conversationId = conversationId
-    }
-
-    // MARK: - Conversation Loading
-
-    func loadConversation() async {
-        guard let conversationId else { return }
-        isLoadingConversation = true
-        do {
-            let response = try await client.listMessages(conversationId: conversationId)
-            messages = response.data
-            messagesPage = response
-        } catch {
-            errorMessage = error.localizedDescription
+        self.state = ConversationState(client: client, conversationId: conversationId)
+        registerTools(on: client)
+        if let conversationId {
+            Task { [state] in await state.loadHistory(conversationId: conversationId) }
         }
-        isLoadingConversation = false
     }
 
-    func loadMoreMessages() async {
-        guard !isLoadingMore, let page = messagesPage else { return }
+    // MARK: - Actions (forwarded to ConversationState)
 
-        isLoadingMore = true
-        do {
-            if let next = try await page.loadMore() {
-                messages.insert(contentsOf: next.data, at: 0)
-                messagesPage = next
-            }
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoadingMore = false
-    }
-
-    // MARK: - Messaging
-
-    func sendMessage() async {
+    func sendMessage() {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
-
-        messages.append(Message(id: UUID().uuidString, text: text, sender: .user, date: .now))
         inputText = ""
-        isLoading = true
-        errorMessage = nil
-
-        await consumeStream(client.stream(text, conversationId: conversationId))
-
-        isLoading = false
+        Task { [state] in await state.sendMessage(text) }
     }
 
-    func retryMessage(_ messageId: String) async {
-        guard let conversationId else { return }
+    func retryMessage(_ messageId: String) {
+        Task { [state] in await state.retry(messageId: messageId) }
+    }
 
-        if let index = messages.lastIndex(where: { $0.id == messageId }) {
-            messages.removeSubrange(index...)
-        }
-
-        isLoading = true
-        errorMessage = nil
-        await consumeStream(client.retry(conversationId: conversationId, messageId: messageId))
-        isLoading = false
+    func loadMoreHistory() {
+        Task { [state] in await state.loadMoreHistory() }
     }
 
     func newConversation() {
-        currentStream?.cancel()
-        messages = []
-        messagesPage = nil
-        inputText = ""
-        errorMessage = nil
-        conversationId = nil
+        state.clear()
     }
 
-    func stopStreaming() {
-        currentStream?.cancel()
-        isLoading = false
+    // MARK: - Tool handlers
+    //
+    // Registered once on the client. The SDK auto-runs them during send/retry
+    // and continues the conversation. Return a JSONValue to resolve; return
+    // an `{"error": ...}` payload (or throw) to surface an error.
+
+    private func registerTools(on client: ChatbaseClient) {
+        // Async UI interaction: open a picker, wait for user, submit result.
+        // Returning an `{"error": ...}` payload surfaces the failure to the
+        // agent without throwing.
+        client.tool("change_background") { [weak self] _ in
+            guard let self else {
+                return .object(["error": .string("View model released")])
+            }
+            guard let color = await self.awaitColorPick() else {
+                return .object(["error": .string("User dismissed the color picker")])
+            }
+            await self.apply(background: color)
+            return .object(["color": .string(color.description)])
+        }
     }
 
-    // MARK: - Color Picker (deferred tool call example)
+    @MainActor private func apply(background color: Color) {
+        self.background = color
+    }
+
+    // MARK: - Color picker
 
     func resolveColorPick(_ color: Color) {
         showColorPicker = false
@@ -127,121 +95,6 @@ class ChatViewModel {
         await withCheckedContinuation { continuation in
             colorPickContinuation = continuation
             showColorPicker = true
-        }
-    }
-
-    // MARK: - Stream Consumer
-
-    private func consumeStream(_ chatStream: ChatStream) async {
-        currentStream = chatStream
-
-        let placeholderId = UUID().uuidString
-        var messageId = placeholderId
-        messages.append(Message(id: placeholderId, text: "", sender: .agent, date: .now))
-
-        var shouldContinue = false
-
-        do {
-            for try await event in chatStream {
-                switch event {
-                case .messageStarted(let id):
-                    if let i = messages.lastIndex(where: { $0.id == messageId }) {
-                        messages[i].id = id
-                        messageId = id
-                    }
-                case .text(let chunk):
-                    if let i = messages.lastIndex(where: { $0.id == messageId }) {
-                        messages[i].text += chunk
-                    }
-                case .finished(let info):
-                    if let id = info.conversationId {
-                        conversationId = id
-                    }
-                case .toolCall(let call):
-                    shouldContinue = await handleToolCall(call)
-                }
-            }
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-
-        // Clean up empty placeholder
-        if let i = messages.lastIndex(where: { $0.id == messageId }), messages[i].text.isEmpty {
-            messages.remove(at: i)
-        }
-
-        currentStream = nil
-
-        // Continue the conversation if a tool call was resolved with continue: true
-        if shouldContinue, let conversationId {
-            await consumeStream(client.continue(conversationId: conversationId))
-        }
-    }
-
-    // MARK: - Tool Call Handlers
-
-    /// Handles a tool call. Returns true if the conversation should continue.
-    private func handleToolCall(_ call: ToolCallHandle) async -> Bool {
-        switch call.toolName {
-
-        // Example: resolve + continue (deferred UI interaction)
-        // Opens a color picker, waits for user, submits result, agent responds
-        case "change_background":
-            if let color = await awaitColorPick() {
-                background = color
-                await call.resolve(["color": .string(color.description)])
-                return true
-            } else {
-                await call.ignore()
-                return false
-            }
-
-        // Example: resolve + continue (instant, no UI)
-        // Executes immediately, submits result, agent responds with the data
-        case "package_status":
-            guard let email = call.input["email"]?.stringValue else {
-                await call.fail("Missing email")
-                return true
-            }
-            let trackingNumber = Int.random(in: 1000000000...9999999999)
-            let status = ["delivered", "in transit", "out for delivery", "cancelled"].randomElement()!
-            await call.resolve([
-                "tracking_number": .int(trackingNumber),
-                "status": .string(status),
-                "email": .string(email)
-            ])
-            return true
-
-        // Example: resolve + no continue
-        // Submits result but conversation pauses — consumer resumes later
-        case "start_checkout":
-            let amount = call.input["amount"]?.numberValue ?? 0
-            logger.info("Starting checkout for amount: \(amount)")
-            await call.resolve(["status": .string("checkout_started")])
-            return false
-
-        // Example: fail + continue
-        // Tool execution fails, agent sees the error and responds
-        case "fetch_order":
-            guard let orderId = call.input["order_id"]?.stringValue else {
-                await call.fail("Missing order_id")
-                return true
-            }
-            // Simulate a failed lookup
-            await call.fail("Order \(orderId) not found")
-            return true
-
-        // Example: ignore (fire-and-forget)
-        // Don't submit anything, don't continue
-        case "log_analytics":
-            logger.info("Analytics: \(call.toolName)")
-            await call.ignore()
-            return false
-
-        default:
-            logger.warning("Unhandled tool call: \(call.toolName)")
-            await call.ignore()
-            return false
         }
     }
 }
