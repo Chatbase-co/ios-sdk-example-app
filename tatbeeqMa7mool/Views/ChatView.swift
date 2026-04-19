@@ -46,9 +46,6 @@ struct ChatView: View {
                             ForEach(viewModel.messages) { message in
                                 MessageBubble(
                                     message: message,
-                                    onFeedback: { feedback in
-                                        Task { await viewModel.toggleFeedback(messageId: message.id, feedback: feedback) }
-                                    },
                                     onRetry: {
                                         Task { await viewModel.retryMessage(message.id) }
                                     }

@@ -10,7 +10,6 @@ import ChatbaseSDK
 
 struct MessageBubble: View {
     let message: Message
-    var onFeedback: ((MessageFeedback) -> Void)?
     var onRetry: (() -> Void)?
 
     var body: some View {
@@ -44,30 +43,12 @@ struct MessageBubble: View {
             }
 
             if message.sender == .agent && !message.text.isEmpty {
-                HStack(spacing: 12) {
-                    Button {
-                        onFeedback?(.positive)
-                    } label: {
-                        Image(systemName: message.feedback == .positive ? "hand.thumbsup.fill" : "hand.thumbsup")
-                            .font(.caption)
-                            .foregroundStyle(message.feedback == .positive ? .green : .secondary)
-                    }
-
-                    Button {
-                        onFeedback?(.negative)
-                    } label: {
-                        Image(systemName: message.feedback == .negative ? "hand.thumbsdown.fill" : "hand.thumbsdown")
-                            .font(.caption)
-                            .foregroundStyle(message.feedback == .negative ? .red : .secondary)
-                    }
-
-                    Button {
-                        onRetry?()
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                Button {
+                    onRetry?()
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
                 .padding(.leading, 4)

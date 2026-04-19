@@ -17,8 +17,8 @@ class ConversationListViewModel {
     private(set) var conversations: [Conversation] = []
     private(set) var isLoading = false
     private(set) var errorMessage: String?
-    private var nextCursor: String?
-    private(set) var hasMore = true
+    private var page: PaginatedResponse<Conversation>?
+    var hasMore: Bool { page?.hasMore ?? true }
 
     init(client: ChatbaseClient) {
         self.client = client
@@ -31,8 +31,7 @@ class ConversationListViewModel {
         do {
             let response = try await client.listConversations()
             conversations = response.data
-            nextCursor = response.pagination.cursor
-            hasMore = response.pagination.hasMore
+            page = response
         } catch {
             logger.error("Failed to load conversations: \(error.localizedDescription)")
             errorMessage = error.localizedDescription
@@ -42,14 +41,14 @@ class ConversationListViewModel {
     }
 
     func loadMore() async {
-        guard hasMore, !isLoading, let cursor = nextCursor else { return }
+        guard !isLoading, let page else { return }
         isLoading = true
 
         do {
-            let response = try await client.listConversations(cursor: cursor)
-            conversations.append(contentsOf: response.data)
-            nextCursor = response.pagination.cursor
-            hasMore = response.pagination.hasMore
+            if let next = try await page.loadMore() {
+                conversations.append(contentsOf: next.data)
+                self.page = next
+            }
         } catch {
             logger.error("Failed to load more conversations: \(error.localizedDescription)")
             errorMessage = error.localizedDescription

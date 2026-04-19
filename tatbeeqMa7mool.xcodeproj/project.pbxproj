@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		78C5B61F2F64CB020096441A /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 78C5B61E2F64CB020096441A /* Secrets.xcconfig */; };
-		78F3D51E2F7DEE6D005F5890 /* ChatbaseSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 78F3D51D2F7DEE6D005F5890 /* ChatbaseSDK */; };
+		7878FD122F94248A008B725E /* ChatbaseSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 7878FD112F94248A008B725E /* ChatbaseSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				78F3D51E2F7DEE6D005F5890 /* ChatbaseSDK in Frameworks */,
+				7878FD122F94248A008B725E /* ChatbaseSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,7 +124,7 @@
 			);
 			name = tatbeeqMa7mool;
 			packageProductDependencies = (
-				78F3D51D2F7DEE6D005F5890 /* ChatbaseSDK */,
+				7878FD112F94248A008B725E /* ChatbaseSDK */,
 			);
 			productName = tatbeeqMa7mool;
 			productReference = 78C5B5F92F6260520096441A /* tatbeeqMa7mool.app */;
@@ -139,7 +138,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2640;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					7881F66E2F7C59CB002DB920 = {
 						CreatedOnToolsVersion = 26.4;
@@ -160,7 +159,7 @@
 			mainGroup = 78C5B5F02F6260520096441A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				78F3D51C2F7DEE6D005F5890 /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */,
+				78BF1C1F2F9461E000E1A17F /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 78C5B5FA2F6260520096441A /* Products */;
@@ -185,7 +184,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				78C5B61F2F64CB020096441A /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,6 +319,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -378,6 +377,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -483,7 +483,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		78F3D51C2F7DEE6D005F5890 /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */ = {
+		78BF1C1F2F9461E000E1A17F /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Chatbase-co/chatbase-ios-sdk";
 			requirement = {
@@ -494,9 +494,8 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		78F3D51D2F7DEE6D005F5890 /* ChatbaseSDK */ = {
+		7878FD112F94248A008B725E /* ChatbaseSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 78F3D51C2F7DEE6D005F5890 /* XCRemoteSwiftPackageReference "chatbase-ios-sdk" */;
 			productName = ChatbaseSDK;
 		};
 /* End XCSwiftPackageProductDependency section */

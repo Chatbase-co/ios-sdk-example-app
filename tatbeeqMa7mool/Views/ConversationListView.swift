@@ -10,6 +10,8 @@ import ChatbaseSDK
 
 struct ConversationListView: View {
     @State var viewModel: ConversationListViewModel
+    @State var authViewModel: AuthViewModel
+    @State private var showingAuthSheet = false
 
     var body: some View {
         NavigationStack {
@@ -46,13 +48,23 @@ struct ConversationListView: View {
                 )
             }
             .toolbar {
-                NavigationLink {
-                    ChatView(viewModel: ChatViewModel(client: viewModel.client))
-                } label: {
-                    Image(systemName: "square.and.pencil")
+                ToolbarItem(placement: .topBarLeading) {
+                    AuthBadge(viewModel: authViewModel) {
+                        showingAuthSheet = true
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        ChatView(viewModel: ChatViewModel(client: viewModel.client))
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
                 }
             }
-            .task { await viewModel.loadConversations() }
+            .sheet(isPresented: $showingAuthSheet) {
+                AuthSheet(viewModel: authViewModel)
+            }
+            .task(id: authViewModel.isIdentified) { await viewModel.loadConversations() }
             .refreshable { await viewModel.loadConversations() }
             .overlay {
                 if viewModel.isLoading && viewModel.conversations.isEmpty {
@@ -60,6 +72,40 @@ struct ConversationListView: View {
                 }
             }
         }
+    }
+}
+
+private struct AuthBadge: View {
+    let viewModel: AuthViewModel
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: viewModel.isIdentified
+                    ? "person.crop.circle.badge.checkmark"
+                    : "person.crop.circle")
+                    .foregroundStyle(viewModel.isIdentified ? .green : .secondary)
+                Text(viewModel.isIdentified ? (viewModel.currentUserId ?? "Signed in") : "Guest")
+                    .font(.footnote)
+                    .lineLimit(1)
+                    .foregroundStyle(.primary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(
+                Capsule()
+                    .fill(.thinMaterial)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(viewModel.isIdentified ? Color.green.opacity(0.3) : Color.secondary.opacity(0.2), lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(viewModel.isIdentified
+            ? "Signed in as \(viewModel.currentUserId ?? "user")"
+            : "Guest — tap to sign in")
     }
 }
 

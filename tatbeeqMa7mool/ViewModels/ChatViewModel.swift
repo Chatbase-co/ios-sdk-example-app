@@ -22,8 +22,8 @@ class ChatViewModel {
     private(set) var isLoadingConversation: Bool = false
     private(set) var isLoadingMore: Bool = false
     private(set) var errorMessage: String?
-    private var messageCursor: String?
-    private(set) var hasMoreMessages: Bool = false
+    private var messagesPage: PaginatedResponse<Message>?
+    var hasMoreMessages: Bool { messagesPage?.hasMore ?? false }
     private var currentStream: ChatStream?
 
     // UI state for color picker tool
@@ -42,10 +42,9 @@ class ChatViewModel {
         guard let conversationId else { return }
         isLoadingConversation = true
         do {
-            let (_, msgs, pagination) = try await client.getConversation(conversationId)
-            messages = msgs
-            messageCursor = pagination.cursor
-            hasMoreMessages = pagination.hasMore
+            let response = try await client.listMessages(conversationId: conversationId)
+            messages = response.data
+            messagesPage = response
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -53,15 +52,14 @@ class ChatViewModel {
     }
 
     func loadMoreMessages() async {
-        guard let conversationId, hasMoreMessages, !isLoadingMore,
-              let cursor = messageCursor else { return }
+        guard !isLoadingMore, let page = messagesPage else { return }
 
         isLoadingMore = true
         do {
-            let response = try await client.listMessages(conversationId: conversationId, cursor: cursor)
-            messages.insert(contentsOf: response.data, at: 0)
-            messageCursor = response.pagination.cursor
-            hasMoreMessages = response.pagination.hasMore
+            if let next = try await page.loadMore() {
+                messages.insert(contentsOf: next.data, at: 0)
+                messagesPage = next
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -100,6 +98,7 @@ class ChatViewModel {
     func newConversation() {
         currentStream?.cancel()
         messages = []
+        messagesPage = nil
         inputText = ""
         errorMessage = nil
         conversationId = nil
@@ -108,27 +107,6 @@ class ChatViewModel {
     func stopStreaming() {
         currentStream?.cancel()
         isLoading = false
-    }
-
-    // MARK: - Feedback
-
-    func toggleFeedback(messageId: String, feedback: MessageFeedback) async {
-        guard let conversationId else { return }
-        guard let index = messages.firstIndex(where: { $0.id == messageId }) else { return }
-
-        let current = messages[index].feedback
-        let newFeedback: MessageFeedback? = current == feedback ? nil : feedback
-
-        do {
-            let updated = try await client.updateFeedback(
-                conversationId: conversationId,
-                messageId: messageId,
-                feedback: newFeedback
-            )
-            messages[index].feedback = updated.feedback
-        } catch {
-            errorMessage = error.localizedDescription
-        }
     }
 
     // MARK: - Color Picker (deferred tool call example)
@@ -181,8 +159,6 @@ class ChatViewModel {
                     }
                 case .toolCall(let call):
                     shouldContinue = await handleToolCall(call)
-                case .error(let error):
-                    errorMessage = error.localizedDescription
                 }
             }
         } catch {
@@ -214,8 +190,10 @@ class ChatViewModel {
             if let color = await awaitColorPick() {
                 background = color
                 await call.resolve(["color": .string(color.description)])
+                return true
             } else {
-                call.ignore()
+                await call.ignore()
+                return false
             }
 
         // Example: resolve + continue (instant, no UI)
@@ -223,7 +201,7 @@ class ChatViewModel {
         case "package_status":
             guard let email = call.input["email"]?.stringValue else {
                 await call.fail("Missing email")
-                return call.shouldContinue
+                return true
             }
             let trackingNumber = Int.random(in: 1000000000...9999999999)
             let status = ["delivered", "in transit", "out for delivery", "cancelled"].randomElement()!
@@ -232,35 +210,38 @@ class ChatViewModel {
                 "status": .string(status),
                 "email": .string(email)
             ])
+            return true
 
         // Example: resolve + no continue
         // Submits result but conversation pauses — consumer resumes later
         case "start_checkout":
             let amount = call.input["amount"]?.numberValue ?? 0
             logger.info("Starting checkout for amount: \(amount)")
-            await call.resolve(["status": .string("checkout_started")], continue: false)
+            await call.resolve(["status": .string("checkout_started")])
+            return false
 
         // Example: fail + continue
         // Tool execution fails, agent sees the error and responds
         case "fetch_order":
             guard let orderId = call.input["order_id"]?.stringValue else {
                 await call.fail("Missing order_id")
-                return call.shouldContinue
+                return true
             }
             // Simulate a failed lookup
             await call.fail("Order \(orderId) not found")
+            return true
 
         // Example: ignore (fire-and-forget)
         // Don't submit anything, don't continue
         case "log_analytics":
             logger.info("Analytics: \(call.toolName)")
-            call.ignore()
+            await call.ignore()
+            return false
 
         default:
             logger.warning("Unhandled tool call: \(call.toolName)")
-            call.ignore()
+            await call.ignore()
+            return false
         }
-
-        return call.shouldContinue
     }
 }
